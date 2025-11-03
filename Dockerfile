@@ -13,13 +13,14 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
-# Upgrade pip and install main dependencies
-RUN python3 -m pip install --upgrade pip setuptools wheel
+# Upgrade pip
+RUN python3 -m pip install --upgrade pip setuptools wheel && \
+    rm -rf /root/.cache
 
 # Install PyTorch with CUDA 12.4 support
 RUN pip3 install --no-cache-dir --index-url https://download.pytorch.org/whl/cu124 \
-    torch \
-    torchaudio
+    torch torchaudio && \
+    rm -rf /root/.cache /tmp/*
 
 # Install core dependencies
 RUN pip3 install --no-cache-dir \
@@ -27,25 +28,29 @@ RUN pip3 install --no-cache-dir \
     "faster-whisper>=1.0.0" \
     "runpod>=1.4.0" \
     "requests>=2.0.0" \
-    yt-dlp
+    yt-dlp && \
+    rm -rf /root/.cache /tmp/*
 
 # Install audio processing libraries
 RUN pip3 install --no-cache-dir \
-    scipy \
-    librosa \
-    soundfile
+    scipy librosa soundfile && \
+    rm -rf /root/.cache /tmp/*
 
-# Install WhisperX and pyannote for diarization
-RUN pip3 install --no-cache-dir \
-    whisperx \
-    "pyannote.audio>=3.0.0"
+# Install WhisperX
+RUN pip3 install --no-cache-dir whisperx && \
+    rm -rf /root/.cache /tmp/*
+
+# Install pyannote for diarization
+RUN pip3 install --no-cache-dir "pyannote.audio>=3.0.0" && \
+    rm -rf /root/.cache /tmp/*
 
 # Copy application files
 COPY app.py handler.py /app/
 
-# Clean caches to reduce image size
+# Final cleanup
 RUN pip3 cache purge && \
-    rm -rf /root/.cache /tmp/*
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /root/.cache
 
 # Default command
 CMD ["python3", "handler.py"]
