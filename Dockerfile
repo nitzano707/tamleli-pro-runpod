@@ -18,14 +18,13 @@ WORKDIR /app
 RUN python3 -m pip install --upgrade pip setuptools wheel
 
 # Install required packages (no hard version pins)
-RUN python3 -m pip install --no-cache-dir \
+RUN pip3 install --no-cache-dir \
     "ctranslate2>=4.0,<5" \
     "faster-whisper>=1.0.0" \
-    "whisperx==3.1.1" \
+    whisperx \
     "runpod>=1.4.0" \
-    "numpy>=1.26" \
-    "requests>=2.0" \
-    "yt-dlp"
+    "requests>=2.0.0" \
+    yt-dlp
 
 # Copy application files
 COPY app.py handler.py /app/
