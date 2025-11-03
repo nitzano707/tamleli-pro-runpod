@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
-# Base CUDA with GPU support
-FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
+# Base CUDA with cuDNN 9 (CRITICAL: pyannote needs cuDNN 9!)
+FROM nvidia/cuda:12.1.1-cudnn9-runtime-ubuntu22.04
 
 # Install system packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -43,8 +43,9 @@ RUN pip3 install --no-cache-dir \
 # Copy application files
 COPY app.py handler.py /app/
 
-# Clean caches
-RUN rm -rf /root/.cache /tmp/*
+# Clean caches to reduce image size
+RUN pip3 cache purge && \
+    rm -rf /root/.cache /tmp/*
 
 # Default command
 CMD ["python3", "handler.py"]
