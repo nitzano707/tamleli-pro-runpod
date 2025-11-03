@@ -14,14 +14,8 @@ WORKDIR /app
 # Upgrade pip and install main dependencies
 RUN python3 -m pip install --upgrade pip setuptools wheel
 
-RUN pip3 install --no-cache-dir \
-    "ctranslate2>=4.0,<5" \
-    "faster-whisper>=1.0.0" \
-    "whisperx==3.1.1" \
-    "runpod>=1.4.0" \
-    "numpy==1.26.*" \
-    "requests==2.*" \
-    "yt-dlp==2025.1.26"
+RUN pip3 install --no-cache-dir "ctranslate2>=4.0,<5" "faster-whisper>=1.0.0" "whisperx==3.1.1" "runpod>=1.4.0" "numpy==1.26.*" "requests==2.*" "yt-dlp==2025.1.26"
+
 
 COPY app.py handler.py /app/
 
