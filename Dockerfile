@@ -48,8 +48,7 @@ RUN pip3 install --no-cache-dir "pyannote.audio>=3.0.0" && \
 COPY app.py handler.py /app/
 
 # Final cleanup
-RUN pip3 cache purge && \
-    apt-get clean && \
+RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /root/.cache
 
 # Default command
