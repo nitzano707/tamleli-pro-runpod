@@ -1,5 +1,4 @@
 # syntax=docker/dockerfile:1
-
 # Base CUDA with GPU support
 FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
 
@@ -17,7 +16,11 @@ WORKDIR /app
 # Upgrade pip and install main dependencies
 RUN python3 -m pip install --upgrade pip setuptools wheel
 
-# Install required packages (no hard version pins)
+# Install PyTorch with CUDA 12.1
+RUN pip3 install --no-cache-dir --index-url https://download.pytorch.org/whl/cu121 \
+    torch torchaudio
+
+# Install required packages
 RUN pip3 install --no-cache-dir \
     "ctranslate2>=4.0,<5" \
     "faster-whisper>=1.0.0" \
