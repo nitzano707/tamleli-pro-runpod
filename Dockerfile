@@ -1,38 +1,46 @@
-# syntax=docker/dockerfile:1
-
-# Base CUDA with GPU support
 FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
 
-# Install system packages
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    python3 python3-pip ffmpeg git libsndfile1 && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Environment variables
-ENV PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1
-
+# Set working directory
 WORKDIR /app
 
-# Upgrade pip
-RUN python3 -m pip install --upgrade pip setuptools wheel
+# Install system dependencies
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    python3 \
+    python3-pip \
+    python3-venv \
+    ffmpeg \
+    git \
+    curl \
+    ca-certificates \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install dependencies (yt-dlp not version pinned)
-RUN python3 -m pip install --no-cache-dir \
+# Upgrade pip
+RUN pip3 install --no-cache-dir --upgrade pip
+
+# Install PyTorch with CUDA 12.1 support
+RUN pip3 install --no-cache-dir --index-url https://download.pytorch.org/whl/cu121 \
+    torch \
+    torchaudio
+
+# Install faster-whisper, CTranslate2, WhisperX and other dependencies
+RUN pip3 install --no-cache-dir \
     "ctranslate2>=4.0,<5" \
     "faster-whisper>=1.0.0" \
-    "whisperx==3.1.1" \
+    whisperx==3.1.1 \
     "runpod>=1.4.0" \
-    "numpy>=1.26" \
-    "requests>=2.0" \
-    "yt-dlp"
+    "numpy==1.26.*" \
+    "requests==2.*" \
+    yt-dlp==2025.1.26
 
-# Copy app files
-COPY app.py handler.py /app/
+# Copy application files
+COPY . .
 
-# Clean caches
-RUN rm -rf /root/.cache /tmp/*
+# Expose port (if needed)
+# EXPOSE 8000
 
-# Default run command
+# Set environment variables (optional)
+ENV PYTHONUNBUFFERED=1
+
+# Run command
 CMD ["python3", "handler.py"]
