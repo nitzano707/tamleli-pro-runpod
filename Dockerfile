@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
-# Base CUDA with cuDNN 9 (CRITICAL: pyannote needs cuDNN 9!)
-FROM nvidia/cuda:12.1.1-cudnn9-runtime-ubuntu22.04
+# Base CUDA 12.4 with cuDNN 9 (pyannote requires cuDNN 9)
+FROM nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04
 
 # Install system packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -16,10 +16,10 @@ WORKDIR /app
 # Upgrade pip and install main dependencies
 RUN python3 -m pip install --upgrade pip setuptools wheel
 
-# Install PyTorch with CUDA 12.1 support
-RUN pip3 install --no-cache-dir --index-url https://download.pytorch.org/whl/cu121 \
-    torch==2.1.0 \
-    torchaudio==2.1.0
+# Install PyTorch with CUDA 12.4 support
+RUN pip3 install --no-cache-dir --index-url https://download.pytorch.org/whl/cu124 \
+    torch \
+    torchaudio
 
 # Install core dependencies
 RUN pip3 install --no-cache-dir \
